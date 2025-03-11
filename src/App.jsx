@@ -17,6 +17,7 @@ function App() {
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/forum" element={<ForumPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/profile" element={<div>Страница профиля в разработке</div>} /><Route path="/profile" element={<div>Страница профиля в разработке</div>} />
       </Routes>
     </>
   );
