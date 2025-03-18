@@ -1,6 +1,7 @@
 const ApiError = require('../exceptions/api-error');
 
 module.exports = function(err, req, res, next) {
+    console.error('Ошибка:', err.stack);
   // Явно указываем Content-Type как JSON
   res.setHeader('Content-Type', 'application/json');
 
