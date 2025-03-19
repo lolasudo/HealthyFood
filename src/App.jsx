@@ -6,7 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import './App.css';
 
-// Заглушки для страниц
+// Заглушки
 const HomePage = () => <div></div>;
 const RecipesPage = () => <div>Рецепты</div>;
 const ForumPage = () => <div>Форум</div>;

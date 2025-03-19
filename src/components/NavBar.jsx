@@ -15,7 +15,7 @@ import {
   import { useState } from 'react';
   import { Link } from 'react-router-dom';
   import { theme } from '../theme';
-  import AuthModal from './ProfileAuth/AuthModal'; // Импортируем модальное окно
+  import AuthModal from './ProfileAuth/AuthModal';
   
   const NavButton = styled(Button)(({ theme }) => ({
     margin: theme.spacing(0, 1),
@@ -157,8 +157,7 @@ import {
                     </Toolbar>
                 </Container>
             </AppBar>
-  
-            {/* Модальное окно */}
+            
             <AuthModal open={modalOpen} handleClose={handleCloseModal} />
         </>
     );

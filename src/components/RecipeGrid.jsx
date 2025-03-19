@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import recipesData from '../data/recipes' // пример, если у тебя есть отдельный файл с рецептами
+import recipesData from '../data/recipes' // ОТДЕЛ файл с рецептом
 import ModalRecipe from './ModalRecipe'
 
 function RecipeGrid() {
@@ -15,7 +15,7 @@ function RecipeGrid() {
 
   return (
     <div style={gridStyles.container}>
-      {/* По макету 12 карточек (или сколько есть в массиве) */}
+      {/* Дополнить потом НЕ ЗАБЫТЬ */}
       {recipesData.map((recipe) => (
         <div
           key={recipe.id}
