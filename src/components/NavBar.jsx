@@ -73,7 +73,7 @@ import {
                                     textDecoration: 'none'
                                 }}
                             >
-                                CulinaryMaster
+                                HealthyFoods
                             </Typography>
                         </Box>
   

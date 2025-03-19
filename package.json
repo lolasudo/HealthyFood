@@ -1,7 +1,7 @@
 {
-  "name": "react-app",
+  "name": "healthyfood",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,8 @@
     "@mui/material": "^6.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.3.0"
+    "react-router-dom": "^7.3.0",
+    "react-icons": "^4.8.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
