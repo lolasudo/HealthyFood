@@ -7,23 +7,25 @@ const sendEmail = require('../utils/sendEmail');
 const register = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const candidate = await User.findOne({ email });
-    if (candidate) return res.status(400).json({ message: 'Пользователь уже существует' });
 
-    const hashPassword = await bcrypt.hash(password, 5);
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Пользователь уже существует' });
+
+    const hashedPassword = await bcrypt.hash(password, 12);
     const activationLink = uuidv4();
 
-    const user = await User.create({
+    const newUser = await User.create({
       email,
-      password: hashPassword,
+      password: hashedPassword,
       activationLink,
     });
 
-    const link = `${process.env.API_URL}/api/auth/activate/${activationLink}`;
-    await sendEmail(email, link);
+    const activationUrl = `${process.env.API_URL}/api/auth/activate/${activationLink}`;
+    await sendEmail(email, activationUrl);
 
     return res.status(201).json({ message: 'Письмо активации отправлено на email' });
-  } catch (e) {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Ошибка регистрации' });
   }
 };
@@ -36,8 +38,9 @@ const activate = async (req, res) => {
     user.isActivated = true;
     await user.save();
 
-    return res.redirect(process.env.CLIENT_URL);
-  } catch (e) {
+    return res.redirect(process.env.CLIENT_URL); // Редирект на фронт
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Ошибка активации' });
   }
 };
@@ -45,19 +48,25 @@ const activate = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Пользователь не найден' });
     if (!user.isActivated) return res.status(400).json({ message: 'Аккаунт не активирован' });
 
-    const isPassValid = await bcrypt.compare(password, user.password);
-    if (!isPassValid) return res.status(400).json({ message: 'Неверный пароль' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Неверный пароль' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1h' });
 
     res.json({ token });
-  } catch (e) {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Ошибка входа' });
   }
 };
 
-module.exports = { register, activate, login };
+module.exports = {
+  register,
+  activate,
+  login,
+};
