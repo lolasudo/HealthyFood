@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './theme';
 import './index.css';
-import './styles/gigachat.css';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -1,0 +1,93 @@
+.giga-chat-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: 'Roboto', sans-serif;
+}
+
+.giga-chat-widget {
+    width: 320px;
+    height: 420px;
+    background: #1f1f1f;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+}
+
+.giga-chat-widget.open {
+    display: flex;
+}
+
+.chat-header {
+    background: #0f62fe;
+    color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.chat-log {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #282828;
+    color: white;
+}
+
+.msg {
+    margin-bottom: 10px;
+}
+
+.msg.user {
+    text-align: right;
+    color: #8cd4ff;
+}
+
+.msg.assistant {
+    text-align: left;
+    color: #fff;
+}
+
+.chat-controls {
+    display: flex;
+    border-top: 1px solid #333;
+}
+
+.chat-controls input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #1a1a1a;
+    color: white;
+}
+
+.chat-controls button {
+    background: #0f62fe;
+    border: none;
+    color: white;
+    padding: 0 16px;
+    cursor: pointer;
+}
+
+.open-widget-btn {
+    background: #0f62fe;
+    color: white;
+    font-size: 24px;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+}

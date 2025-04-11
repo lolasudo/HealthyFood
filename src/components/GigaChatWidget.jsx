@@ -1,78 +1,101 @@
-import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
-import { FaComments } from "react-icons/fa";
-
-const socket = io();
+import { useState, useRef, useEffect } from 'react';
+import './GigaChatWidget.css';
 
 const GigaChatWidget = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+    const [input, setInput] = useState('');
+    const [chatLog, setChatLog] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const chatEndRef = useRef(null);
 
-  useEffect(() => {
-    socket.on("chat response", (reply) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "gigachat", text: reply }
-      ]);
-    });
-
-    return () => {
-      socket.off("chat response");
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-  }, []);
 
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
-  };
+    useEffect(scrollToBottom, [chatLog]);
 
-  const sendMessage = () => {
-    if (!inputValue.trim()) return;
+    const sendMessage = async () => {
+        if (!input.trim()) return;
 
-    const userMessage = { sender: "user", text: inputValue };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+        const userMessage = { role: 'user', content: input };
+        setChatLog((prev) => [...prev, userMessage]);
+        setInput('');
+        setLoading(true);
 
-    socket.emit("chat message", inputValue);
-    setInputValue("");
-  };
+        try {
+            const response = await fetch("http://localhost:3001/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "GigaChat",
+                    messages: [{ role: "user", content: message }],
+                    temperature: 0.8,
+                    top_p: 0.95,
+                    n: 1,
+                    stream: false
+                }),
+            });
 
-  return (
-    <aside className="gigachat-widget">
-      <div className="chat-icon" onClick={toggleChat}>
-        <FaComments size={24} />
-      </div>
+            if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+            const data = await response.json();
+            console.log("Ответ от ИИ:", data);
 
-      {isOpen && (
-        <div className="chat-window">
-          <div className="chat-header">
-            <h4>GigaChat</h4>
-            <button onClick={toggleChat} className="close-btn">×</button>
-          </div>
-          <div className="chat-body">
-            {messages.map((msg, index) => (
-              <div key={index} className={`chat-message ${msg.sender === "user" ? "user" : "gigachat"}`}>
-                <span>{msg.text}</span>
-              </div>
-            ))}
-          </div>
-          <div className="chat-footer">
-            <input
-              type="text"
-              placeholder="Введите сообщение..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-            />
-            <button onClick={sendMessage}>Отправить</button>
-          </div>
+            const assistantMessage = data.choices?.[0]?.message || {
+                role: 'assistant',
+                content: '⚠️ Ответ не получен от GigaChat',
+            };
+
+            setChatLog((prev) => [...prev, assistantMessage]);
+        } catch (err) {
+            setChatLog((prev) => [...prev, {
+                role: 'assistant',
+                content: `❌ Произошла ошибка: ${err.message}`,
+            }]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="giga-chat-wrapper">
+            <div className={`giga-chat-widget ${isOpen ? 'open' : ''}`}>
+                <div className="chat-header">
+                    <span>🤖 GigaChat</span>
+                    <button className="close-btn" onClick={() => setIsOpen(false)}>×</button>
+                </div>
+
+                <div className="chat-log">
+                    {chatLog.map((msg, i) => (
+                        <div key={i} className={`msg ${msg.role}`}>
+                            <b>{msg.role === 'user' ? 'Вы' : 'GigaChat'}:</b> {msg.content}
+                        </div>
+                    ))}
+                    <div ref={chatEndRef} />
+                </div>
+
+                <div className="chat-controls">
+                    <input
+                        type="text"
+                        placeholder="Напишите сообщение..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                    />
+                    <button onClick={sendMessage} disabled={loading}>
+                        {loading ? '...' : '➤'}
+                    </button>
+                </div>
+            </div>
+
+            {!isOpen && (
+                <button className="open-widget-btn" onClick={() => setIsOpen(true)}>
+                    💬
+                </button>
+            )}
         </div>
-      )}
-    </aside>
-  );
+    );
 };
 
 export default GigaChatWidget;

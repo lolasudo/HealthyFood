@@ -10,35 +10,44 @@ const { Server } = require("socket.io");
 const axios = require('axios');
 const server = http.createServer(app);
 const io = new Server(server);
-
 const PORT = process.env.PORT || 5000;
 
-// Если используется сборка, отдаем статические файлы
 app.use(express.static(path.join(__dirname, '../dist')));
 app.use(express.json());
 
-// Пример простого эндпоинта для проверки работоспособности сервера
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// WebSocket-соединение
 io.on('connection', (socket) => {
   console.log('Пользователь подключился к WebSocket');
 
   socket.on('chat message', async (msg) => {
     console.log("Получено сообщение:", msg);
     try {
-      // Прокси-запрос к API GigaChat (замените URL и параметры согласно документации)
-      const response = await axios.post("https://api.sberbank.ru/gigachat", {
-        message: msg
+      // Выполняем запрос к API GigaChat.
+      // Если требуется авторизация, задайте нужный API-ключ в заголовке Authorization.
+      const response = await axios({
+        method: "POST",
+        url: "https://api.sberbank.ru/gigachat", // Убедитесь, что URL корректный
+        headers: {
+          "Content-Type": "application/json",
+          // Если API требует авторизации, добавьте:
+          // "Authorization": "Bearer YOUR_API_KEY"
+        },
+        data: { message: msg }
       });
       const reply = response.data.reply || "Нет ответа от GigaChat";
-      // Отправка ответа клиенту
       socket.emit('chat response', reply);
     } catch (error) {
       console.error("Ошибка обращения к GigaChat:", error);
-      socket.emit('chat response', "Ошибка обращения к GigaChat");
+      let errorMessage = "Ошибка обращения к GigaChat";
+      if (error.response) {
+        errorMessage += `: ${error.response.status} ${error.response.statusText}`;
+      } else {
+        errorMessage += `: ${error.message}`;
+      }
+      socket.emit('chat response', errorMessage);
     }
   });
 
@@ -58,9 +67,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions)); // Применяем CORS на все запросы
-
-// Middleware
-app.use(express.json()); // Для парсинга JSON в теле запроса
 
 // Соединение с базой данных MongoDB
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })

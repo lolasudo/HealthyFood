@@ -7,10 +7,8 @@ import NavBar from './components/NavBar';
 import ForumPage from './pages/ForumPage';
 import AboutPage from "./pages/AboutPage";
 import './App.css';
-import './styles/gigachat.css';
 // import GigaChat from "./components/GigaChat";
 import GigaChatWidget from "./components/GigaChatWidget";
-
 
 // Заглушки
 const HomePage = () => <div></div>;
