@@ -4,6 +4,48 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes'); // Импорт маршрутов
 const app = express();
+const http = require('http');
+const path = require('path');
+const { Server } = require("socket.io");
+const axios = require('axios');
+const server = http.createServer(app);
+const io = new Server(server);
+
+const PORT = process.env.PORT || 5000;
+
+// Если используется сборка, отдаем статические файлы
+app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.json());
+
+// Пример простого эндпоинта для проверки работоспособности сервера
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// WebSocket-соединение
+io.on('connection', (socket) => {
+  console.log('Пользователь подключился к WebSocket');
+
+  socket.on('chat message', async (msg) => {
+    console.log("Получено сообщение:", msg);
+    try {
+      // Прокси-запрос к API GigaChat (замените URL и параметры согласно документации)
+      const response = await axios.post("https://api.sberbank.ru/gigachat", {
+        message: msg
+      });
+      const reply = response.data.reply || "Нет ответа от GigaChat";
+      // Отправка ответа клиенту
+      socket.emit('chat response', reply);
+    } catch (error) {
+      console.error("Ошибка обращения к GigaChat:", error);
+      socket.emit('chat response', "Ошибка обращения к GigaChat");
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Пользователь отключился от WebSocket');
+  });
+});
 
 // Загружаем переменные окружения из файла .env
 dotenv.config();

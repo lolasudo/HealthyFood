@@ -1,0 +1,119 @@
+.gigachat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* Кнопка-иконка чата */
+.gigachat-widget .chat-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #2f8de4;
+    /* современный голубой */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+.gigachat-widget .chat-icon:hover {
+    background-color: #005cbf;
+    /* более тёмный оттенок при наведении */
+}
+
+/* Окно чата */
+.gigachat-widget .chat-window {
+    position: absolute;
+    bottom: 70px;
+    /* чтобы окно открывалось над иконкой */
+    right: 0;
+    width: 300px;
+    height: 400px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Шапка чата */
+.gigachat-widget .chat-header {
+    background-color: #2f8de4;
+    color: #fff;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gigachat-widget .chat-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.gigachat-widget .close-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Тело чата */
+.gigachat-widget .chat-body {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.gigachat-widget .chat-message {
+    margin-bottom: 8px;
+    border-radius: 4px;
+    padding: 6px 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.gigachat-widget .chat-message.user {
+    background-color: #d9edf7;
+    align-self: flex-end;
+}
+
+.gigachat-widget .chat-message.gigachat {
+    background-color: #e6e6e6;
+    align-self: flex-start;
+}
+
+/* Нижняя панель ввода */
+.gigachat-widget .chat-footer {
+    display: flex;
+    border-top: 1px solid #ccc;
+}
+
+.gigachat-widget .chat-footer input {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.gigachat-widget .chat-footer button {
+    background-color: #2f8de4;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.gigachat-widget .chat-footer button:hover {
+    background-color: #005cbf;
+}
