@@ -5,19 +5,60 @@ const AuthModal = ({ open, handleClose }) => {
   const [isLogin, setIsLogin] = useState(true); // Состояние для переключения между авторизацией и регистрацией
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState(''); // Для обработки ошибок
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Логика для отправки данных авторизации/регистрации
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Remember Me:', rememberMe);
-    handleClose(); // Закрыть окно после отправки
+
+    // Проверка на совпадение пароля для регистрации
+    if (!isLogin && password !== confirmPassword) {
+      setError('Пароли не совпадают');
+      return;
+    }
+
+    try {
+      let response;
+
+      // Если форма для входа
+      if (isLogin) {
+        response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+      } else {
+        // Если форма для регистрации
+        response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+      }
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Успех
+        console.log(data);
+        handleClose(); // Закрыть окно после успешной отправки
+      } else {
+        // Ошибка
+        setError(data.message || 'Что-то пошло не так');
+      }
+    } catch (err) {
+      setError('Ошибка сети');
+    }
   };
 
   const toggleForm = () => {
     setIsLogin(!isLogin); // Переключение между авторизацией и регистрацией
+    setError(''); // Сбрасываем ошибки при переключении форм
   };
 
   return (
@@ -32,12 +73,18 @@ const AuthModal = ({ open, handleClose }) => {
           bgcolor: 'background.paper',
           boxShadow: 24,
           p: 4,
-          borderRadius: 2
+          borderRadius: 2,
         }}
       >
         <Typography variant="h6" component="h2" sx={{ textAlign: 'center' }}>
           {isLogin ? 'Вход в аккаунт' : 'Регистрация'}
         </Typography>
+
+        {error && (
+          <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
+            {error}
+          </Typography>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -58,13 +105,15 @@ const AuthModal = ({ open, handleClose }) => {
             onChange={(e) => setPassword(e.target.value)}
             sx={{ mt: 2 }}
           />
-          
+
           {!isLogin && (
             <TextField
               label="Подтвердите пароль"
               type="password"
               fullWidth
               required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               sx={{ mt: 2 }}
             />
           )}
@@ -75,12 +124,7 @@ const AuthModal = ({ open, handleClose }) => {
             sx={{ mt: 2 }}
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 3 }}
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
             {isLogin ? 'Войти' : 'Зарегистрироваться'}
           </Button>
         </form>

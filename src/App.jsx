@@ -7,6 +7,7 @@ import NavBar from './components/NavBar';
 import ForumPage from './pages/ForumPage';
 import './App.css';
 
+
 // Заглушки
 const HomePage = () => <div></div>;
 const RecipesPage = () => <div>Рецепты</div>;
