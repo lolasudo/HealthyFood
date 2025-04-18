@@ -1,19 +1,17 @@
-import React from 'react';
-import '../App.css';
-// import Box from '@material-ui/core/Box';
-// import { FaSearch } from 'react-icons/fa' // иконка
+import React from "react";
+import "../App.css";
 
-function SearchBar() {
+function SearchBar({ searchTerm, setSearchTerm }) {
   return (
     <div className="search-bar-container">
-      {/* на всяк случай эконку */}
-      {/* <FaSearch style={{ marginRight: '8px' }} /> */}
       <input
         type="text"
-        placeholder="Поиск по сайту"
+        placeholder="Поиск по рецептам"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
     </div>
-  )
+  );
 }
 
-export default SearchBar
+export default SearchBar;

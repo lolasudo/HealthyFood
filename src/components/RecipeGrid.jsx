@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import recipesData from '../data/recipes' // ОТДЕЛ файл с рецептом
 import ModalRecipe from './ModalRecipe'
+import "../App.css"
 
-function RecipeGrid() {
+const RecipeGrid = ({ recipes }) => {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
 
   const openModal = (recipe) => {
@@ -15,29 +15,36 @@ function RecipeGrid() {
 
   return (
     <div style={gridStyles.container}>
-      {/* Дополнить потом НЕ ЗАБЫТЬ */}
-      {recipesData.map((recipe) => (
-        <div
-          key={recipe.id}
-          className="recipe-card"
-          style={gridStyles.card}
-          onClick={() => openModal(recipe)}
-        >
-          <img
-            src={recipe.image}
-            alt={recipe.title}
-            style={gridStyles.cardImage}
-          />
-          <h3 style={gridStyles.cardTitle}>{recipe.title}</h3>
-          <p style={gridStyles.cardDescription}>{recipe.shortDescription}</p>
-        </div>
-      ))}
+      {recipes.length > 0 ? (
+        recipes.map((recipe) => (
+          <div
+            key={recipe.id}
+            className="recipe-card"
+            style={gridStyles.card}
+            onClick={() => openModal(recipe)}
+          >
+            <img
+              src={recipe.image}
+              alt={recipe.title}
+              style={gridStyles.cardImage}
+            />
+            <h3 style={gridStyles.cardTitle}>{recipe.title}</h3>
+            <p style={gridStyles.cardDescription}>
+              {recipe.shortDescription || "Описание отсутствует"}
+            </p>
+          </div>
+        ))
+      ) : (
+        <p>Ничего не найдено</p>
+      )}
 
       {/* Модальное окно */}
-      <ModalRecipe
-        recipe={selectedRecipe}
-        onClose={closeModal}
-      />
+      {selectedRecipe && (
+        <ModalRecipe
+          recipe={selectedRecipe}
+          onClose={closeModal}
+        />
+      )}
     </div>
   )
 }
@@ -45,7 +52,7 @@ function RecipeGrid() {
 const gridStyles = {
   container: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     gap: '20px',
     marginTop: '20px'
   },
@@ -55,7 +62,7 @@ const gridStyles = {
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     padding: '10px',
     cursor: 'pointer',
-    transition: '0.3s'
+    transition: 'transform 0.3s',
   },
   cardImage: {
     width: '100%',

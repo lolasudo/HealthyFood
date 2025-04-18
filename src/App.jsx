@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from "react";
-import SearchBar from './components/SearchBar';
-import RecipeGrid from './components/RecipeGrid';
-import Footer from './components/Footer';
-import { Routes, Route } from 'react-router-dom';
-import NavBar from './components/NavBar';
-import ForumPage from './pages/ForumPage';
+import React, { useState } from "react";
+import SearchBar from "./components/SearchBar";
+import RecipeGrid from "./components/RecipeGrid";
+import Footer from "./components/Footer";
+import { Routes, Route } from "react-router-dom";
+import NavBar from "./components/NavBar";
+import ForumPage from "./pages/ForumPage";
 import AboutPage from "./pages/AboutPage";
-import './App.css';
-// import GigaChat from "./components/GigaChat";
+import "./App.css";
 import GigaChatWidget from "./components/GigaChatWidget";
 
-// Заглушки
+// 👇 Импорт рецептов
+import recipesData from "./data/recipes";
+
 const HomePage = () => <div></div>;
 const RecipesPage = () => <div>Рецепты</div>;
 
 function App() {
-  const [recipes, setRecipes] = useState([]);
-  useEffect(() => {
-    // Загрузка рецептов из локального JSON; при необходимости адаптируйте источник (API, бэкенд)
-    fetch("/data/recipes.json")
-      .then((res) => res.json())
-      .then((data) => setRecipes(data))
-      .catch((error) => console.error("Ошибка загрузки рецептов:", error));
-  }, []);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Фильтрация по названию
+  const filteredRecipes = recipesData.filter((recipe) =>
+    recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -32,23 +31,19 @@ function App() {
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/forum" element={<ForumPage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/profile" element={<div>Страница профиля в разработке</div>} /><Route path="/profile" element={<div>Страница профиля в разработке</div>} />
+        <Route path="/profile" element={<div>Страница профиля в разработке</div>} />
       </Routes>
+
       <div className="app-container">
-        <SearchBar />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <main>
-        <section className="recipes-section">
-        </section>
-        {/* <aside className="chat-section">
-          <GigaChat />
-        </aside> */}
-          <RecipeGrid />
+          <RecipeGrid recipes={filteredRecipes} />
         </main>
         <Footer />
         <GigaChatWidget />
       </div>
     </>
-  )
+  );
 }
 
 export default App;
