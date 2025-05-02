@@ -2,7 +2,7 @@
 
 # Проект по здоровой еде
   
-### `npm run dev`
+### `npm run start`
 
 Сайт открыт
 в [http://localhost:5173](http://localhost:5173) браузере
