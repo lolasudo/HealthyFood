@@ -47,18 +47,61 @@
     color: white;
 }
 
+.welcome-message {
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
 .msg {
     margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-break: break-word;
 }
 
 .msg.user {
     text-align: right;
-    color: #8cd4ff;
+    color: #fff;
+    background-color: #0f62fe;
+    margin-left: auto;
 }
 
 .msg.assistant {
     text-align: left;
     color: #fff;
+    background-color: #383838;
+    margin-right: auto;
+}
+
+.typing-indicator {
+    display: inline-flex;
+}
+
+.typing-indicator span {
+    animation: blink 1.4s infinite both;
+    height: 5px;
+    width: 5px;
+    margin: 0 2px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #fff;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
 }
 
 .chat-controls {
@@ -72,6 +115,12 @@
     border: none;
     background: #1a1a1a;
     color: white;
+    outline: none;
+}
+
+.chat-controls input:disabled {
+    background: #1a1a1a;
+    color: #666;
 }
 
 .chat-controls button {
@@ -80,6 +129,16 @@
     color: white;
     padding: 0 16px;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-controls button:hover:not(:disabled) {
+    background: #0a4cbe;
+}
+
+.chat-controls button:disabled {
+    background: #333;
+    cursor: not-allowed;
 }
 
 .open-widget-btn {
@@ -90,4 +149,11 @@
     padding: 12px 16px;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.open-widget-btn:hover {
+    background: #0a4cbe;
+    transform: scale(1.05);
 }

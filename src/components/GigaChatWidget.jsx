@@ -13,6 +13,24 @@ const GigaChatWidget = () => {
     };
 
     useEffect(scrollToBottom, [chatLog]);
+    
+    // При первом рендере проверяем соединение с API
+    useEffect(() => {
+        const checkApiConnection = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/models');
+                if (response.ok) {
+                    console.log('✅ Соединение с GigaChat API установлено');
+                } else {
+                    console.error('❌ Ошибка соединения с GigaChat API:', await response.text());
+                }
+            } catch (err) {
+                console.error('❌ Сервер недоступен:', err);
+            }
+        };
+        
+        checkApiConnection();
+    }, []);
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -23,32 +41,44 @@ const GigaChatWidget = () => {
         setLoading(true);
 
         try {
+            console.log('Отправка запроса к GigaChat...');
             const response = await fetch("http://localhost:3001/api/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: "GigaChat",
-                    messages: [{ role: "user", content: message }],
-                    temperature: 0.8,
-                    top_p: 0.95,
-                    n: 1,
-                    stream: false
+                    model: "GigaChat", // Или другая доступная модель
+                    messages: [
+                        // Добавляем весь предыдущий контекст беседы
+                        ...chatLog.map(msg => ({ role: msg.role, content: msg.content })),
+                        // Добавляем текущее сообщение
+                        { role: "user", content: input }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1500
                 }),
             });
 
-            if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Ошибка ${response.status}: ${errorText}`);
+            }
+            
             const data = await response.json();
-            console.log("Ответ от ИИ:", data);
+            console.log("Ответ от GigaChat:", data);
 
-            const assistantMessage = data.choices?.[0]?.message || {
-                role: 'assistant',
-                content: '⚠️ Ответ не получен от GigaChat',
-            };
-
-            setChatLog((prev) => [...prev, assistantMessage]);
+            if (data.choices && data.choices.length > 0) {
+                const assistantMessage = {
+                    role: 'assistant',
+                    content: data.choices[0].message.content
+                };
+                setChatLog((prev) => [...prev, assistantMessage]);
+            } else {
+                throw new Error("Некорректный формат ответа от API");
+            }
         } catch (err) {
+            console.error("Ошибка запроса:", err);
             setChatLog((prev) => [...prev, {
                 role: 'assistant',
                 content: `❌ Произошла ошибка: ${err.message}`,
@@ -67,11 +97,27 @@ const GigaChatWidget = () => {
                 </div>
 
                 <div className="chat-log">
+                    {chatLog.length === 0 && (
+                        <div className="welcome-message">
+                            <p>👋 Привет! Я GigaChat. Чем я могу помочь?</p>
+                        </div>
+                    )}
+                    
                     {chatLog.map((msg, i) => (
                         <div key={i} className={`msg ${msg.role}`}>
                             <b>{msg.role === 'user' ? 'Вы' : 'GigaChat'}:</b> {msg.content}
                         </div>
                     ))}
+                    
+                    {loading && (
+                        <div className="msg assistant loading">
+                            <b>GigaChat:</b> 
+                            <span className="typing-indicator">
+                                <span>.</span><span>.</span><span>.</span>
+                            </span>
+                        </div>
+                    )}
+                    
                     <div ref={chatEndRef} />
                 </div>
 
@@ -82,8 +128,9 @@ const GigaChatWidget = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                        disabled={loading}
                     />
-                    <button onClick={sendMessage} disabled={loading}>
+                    <button onClick={sendMessage} disabled={loading || !input.trim()}>
                         {loading ? '...' : '➤'}
                     </button>
                 </div>
